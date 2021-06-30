@@ -6,3 +6,4 @@ services:
     tty: true
     volumes:
       - .:/app
+      - ./.clasprc.json:/root/.clasprc.json
