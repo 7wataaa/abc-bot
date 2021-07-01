@@ -1,6 +1,6 @@
 // original code → https://github.com/7wataaa/abc-bot/blob/master/src/%E3%82%B3%E3%83%BC%E3%83%89.ts
 
-function myFunction() {
+function updateABCSchedule() {
   const getUrl = 'https://atcoder.jp/contests/';
 
   Utilities.sleep(1000);
