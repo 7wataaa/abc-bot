@@ -1,4 +1,4 @@
-// original code → https://github.com/7wataaa/abc-bot/blob/master/src/%E3%82%B3%E3%83%BC%E3%83%89.ts
+// original code → https://github.com/7wataaa/abc-bot/blob/master/src/updateABCSchedule.ts
 
 function updateABCSchedule() {
   const getUrl = 'https://atcoder.jp/contests/';
@@ -45,6 +45,27 @@ function updateABCSchedule() {
 
     return [date, name];
   });
+
+  console.log(scheduledABCValues);
+
+  if (
+    !scheduledABCNames ||
+    !scheduledABCDates ||
+    !scheduledABCValues ||
+    scheduledABCNames.indexOf(undefined) !== -1 ||
+    (() => {
+      for (const e of scheduledABCDates) {
+        if (e.toString() === 'Invalid Date') {
+          return true;
+        }
+      }
+
+      return false;
+    })()
+  ) {
+    console.error('予定されたABCのデータが(正しく)取得できません');
+    return;
+  }
 
   // スプレッドシートへの書き込み
 
