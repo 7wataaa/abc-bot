@@ -1,6 +1,14 @@
 // original code → https://github.com/7wataaa/abc-bot/blob/master/src/updateABCSchedule.ts
 
 function updateABCSchedule() {
+  const zip = (...arrays: any[]) => {
+    const minLength = Math.min(...arrays.map((arr) => arr.length));
+
+    return new Array(minLength)
+      .fill([])
+      .map((_, i) => arrays.map((arr) => arr[i]));
+  };
+
   const getUrl = 'https://atcoder.jp/contests/';
 
   Utilities.sleep(1000);
@@ -28,8 +36,8 @@ function updateABCSchedule() {
     Parser.data(scheduledABCs.join(''))
       .from('<a href="/contests/abc')
       .to('</a>')
-      .iterate() as string[]
-  ).map((str) => str.split('">')[1]);
+      .iterate() as Array<string | undefined>
+  ).map((str) => (typeof str === 'string' ? str.split('">')[1] : undefined));
 
   // ABCの開始時間の配列
   const scheduledABCDates = (
@@ -37,14 +45,22 @@ function updateABCSchedule() {
       .from("<time class='fixtime fixtime-full'>")
       .to('</time>')
       .iterate() as string[]
-  ).map((str) => new Date(str));
+  ).map((str) => new Date(str).toUTCString());
 
-  // {name: コンテスト名, date: 開始時間}の配列
-  const scheduledABCValues = scheduledABCNames.map((name, i) => {
-    const date = scheduledABCDates[i];
+  // ABCのURLの配列
+  const scheduledABCURLs = (
+    Parser.data(scheduledABCs.join(''))
+      .from('<a href="/')
+      .to('">')
+      .iterate() as string[]
+  ).map((str) => `https://atcoder.jp/${str}`);
 
-    return [date, name];
-  });
+  // コンテスト名, 開始時間, リンクの2次元配列
+  const scheduledABCValues = zip(
+    scheduledABCDates,
+    scheduledABCNames,
+    scheduledABCURLs
+  );
 
   console.log(scheduledABCValues);
 
@@ -52,7 +68,7 @@ function updateABCSchedule() {
     !scheduledABCNames ||
     !scheduledABCDates ||
     !scheduledABCValues ||
-    scheduledABCNames.indexOf(undefined) !== -1 ||
+    scheduledABCNames.includes(undefined) ||
     (() => {
       for (const e of scheduledABCDates) {
         if (e.toString() === 'Invalid Date') {
@@ -75,10 +91,10 @@ function updateABCSchedule() {
   const contestsSheet = ss.getSheetByName('contests');
 
   // これまでのコンテスト情報を削除
-  contestsSheet.getDataRange().clearContent();
+  contestsSheet!.getDataRange().clearContent();
 
   // 書き込み
-  contestsSheet
-    .getRange(1, 1, scheduledABCValues.length, 2)
+  contestsSheet!
+    .getRange(1, 1, scheduledABCValues.length, 3)
     .setValues(scheduledABCValues);
 }

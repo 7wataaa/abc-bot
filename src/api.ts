@@ -7,16 +7,17 @@ function doGet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const contestsSheet = ss.getSheetByName('contests');
 
-  const payload = contestsSheet.getDataRange().isBlank()
+  const payload = contestsSheet!.getDataRange().isBlank()
     ? JSON.stringify([])
     : JSON.stringify(
-        contestsSheet
+        contestsSheet!
           .getDataRange()
           .getValues()
           .map((row) => {
             return {
               date: row[0],
               contestName: row[1],
+              url: row[2],
             };
           })
       );
