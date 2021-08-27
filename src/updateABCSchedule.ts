@@ -45,7 +45,7 @@ function updateABCSchedule() {
       .from("<time class='fixtime fixtime-full'>")
       .to('</time>')
       .iterate() as string[]
-  ).map((str) => new Date(str).toUTCString());
+  ).map((str) => new Date(str).toISOString());
 
   // ABCのURLの配列
   const scheduledABCURLs = (
