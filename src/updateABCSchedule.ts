@@ -23,6 +23,19 @@ function updateABCSchedule() {
     .to('</div>')
     .build();
 
+  const hasABCContest = (upComingContestHtml as string).includes(
+    'AtCoder Beginner Contest'
+  );
+
+  if (!hasABCContest) {
+    // コンテストが予定されていないのでシートを殻にして終了
+
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const contestsSheet = ss.getSheetByName('contests');
+    contestsSheet!.getDataRange().clearContent();
+    return;
+  }
+
   // scheduledContestHtmlからABCのみを抽出した配列
   const scheduledABCs = (
     Parser.data(upComingContestHtml)
@@ -45,7 +58,12 @@ function updateABCSchedule() {
       .from("<time class='fixtime fixtime-full'>")
       .to('</time>')
       .iterate() as string[]
-  ).map((str) => new Date(str).toISOString());
+  ).map(function (str) {
+    if (str.length == 0) {
+      return '';
+    }
+    return new Date(str).toISOString();
+  });
 
   // ABCのURLの配列
   const scheduledABCURLs = (
